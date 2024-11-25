@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Click Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #count {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        /* Bounce Animation */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-15px);
+            }
+            60% {
+                transform: translateY(-7px);
+            }
+        }
+        .bouncing {
+            animation: bounce 0.5s;
+        }
+    </style>
+    <script>
+        // Function to send a click event and update the count
+        async function incrementClick() {
+            const button = document.getElementById('click-button');
+            const response = await fetch('/click', { method: 'POST' });
+            const data = await response.json();
+
+            // Update the count
+            document.getElementById('count').innerText = data.count;
+
+            // Add bounce animation
+            button.classList.add('bouncing');
+            button.addEventListener('animationend', () => {
+                button.classList.remove('bouncing');
+            }, { once: true });
+        }
+
+        // Function to fetch the latest click count every second
+        async function fetchCount() {
+            const response = await fetch('/get_count');
+            const data = await response.json();
+            document.getElementById('count').innerText = data.count;
+        }
+
+        // Continuously update the count every second
+        setInterval(fetchCount, 1000);
+    </script>
+</head>
+<body>
+    <h1>Universal Click Tracker</h1>
+    <p>Number of clicks: <span id="count">0</span></p>
+    <button id="click-button" onclick="incrementClick()">Click Me!</button>
+</body>
+</html>
